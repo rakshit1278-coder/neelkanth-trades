@@ -10,7 +10,51 @@
     <!-- Netlify Identity -->
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   </head>
+
   <body>
+    <script>
+      window.CMS_MANUAL_INIT = true;
+    </script>
+
+    <script>
+      CMS.init({
+        config: {
+          backend: {
+            name: "git-gateway",
+            branch: "main"
+          },
+
+          media_folder: "img/products",
+          public_folder: "/img/products",
+
+          collections: [
+            {
+              name: "products",
+              label: "Products",
+              format: "json",
+              folder: "data/products",
+              create: true,
+              slug: "{{slug}}",
+              fields: [
+                { label: "Product ID", name: "id", widget: "string" },
+                { label: "Product Name", name: "name", widget: "string" },
+                { label: "Brand", name: "brand", widget: "string", required: false },
+                { label: "Category", name: "category", widget: "select", options: ["grocery", "cosmetics", "hygiene"] },
+                { label: "Price", name: "price", widget: "number" },
+                { label: "MRP", name: "mrp", widget: "number", required: false },
+                { label: "Stock", name: "stock", widget: "number" },
+                { label: "Unit", name: "unit", widget: "string", required: false },
+                { label: "Image", name: "image", widget: "image" },
+                { label: "Popular", name: "popular", widget: "boolean", default: false },
+                { label: "Active", name: "active", widget: "boolean", default: true },
+                { label: "SKU", name: "sku", widget: "string", required: false }
+              ]
+            }
+          ]
+        }
+      });
+    </script>
+
     <script>
       if (window.netlifyIdentity) {
         window.netlifyIdentity.on("init", user => {
@@ -24,5 +68,3 @@
     </script>
   </body>
 </html>
-
-
