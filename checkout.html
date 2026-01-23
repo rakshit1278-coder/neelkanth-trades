@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Neelkanth Trades</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f5f5f5;
+        }
+
+        h2 {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .checkout-container {
+            width: 90%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        .summary-item {
+            border-bottom: 1px solid #eee;
+            padding: 12px 0;
+        }
+
+        .summary-item p {
+            margin: 5px 0;
+        }
+
+        .total-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: #0f8a52;
+            color: white;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .place-order-btn {
+            width: 100%;
+            padding: 14px;
+            background: #0f8a52;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+
+    <script src="js/main.js"></script>
+</head>
+<body>
+
+<h2>Checkout</h2>
+
+<div class="checkout-container">
+
+    <h3>Your Order Summary</h3>
+
+    <div id="summaryList"></div>
+
+    <div class="total-box" id="grandTotal">Total: ₹0</div>
+
+    <h3 style="margin-top:30px;">Customer Details</h3>
+
+    <label>Customer/Shop Name</label>
+    <input type="text" id="customerName" placeholder="Enter your name">
+
+    <label>Phone Number</label>
+    <input type="text" id="customerPhone" placeholder="Enter phone number">
+
+    <label>Delivery Address</label>
+    <input type="text" id="customerAddress" placeholder="Enter delivery address">
+
+    <button class="place-order-btn" onclick="placeFinalOrder()">Place Order</button>
+
+</div>
+
+<script>
+// LOAD SUMMARY
+function loadSummary() {
+    let cart = JSON.parse(localStorage.getItem("cartItems")) || [];
+    let summaryDiv = document.getElementById("summaryList");
+    let totalAmount = 0;
+
+    summaryDiv.innerHTML = "";
+
+    cart.forEach(item => {
+        let priceMatch = item.name.match(/₹(\d+)/);
+        let price = priceMatch ? parseInt(priceMatch[1]) : 0;
+
+        let total = price * item.qty;
+        totalAmount += total;
+
+        summaryDiv.innerHTML += `
+            <div class="summary-item">
+                <p><b>${item.name}</b></p>
+                <p>Qty: ${item.qty} × ₹${price} = ₹${total}</p>
+            </div>
+        `;
+    });
+
+    document.getElementById("grandTotal").innerText = "Total: ₹" + totalAmount;
+}
+
+// PLACE ORDER
+function placeFinalOrder() {
+    let name = document.getElementById("customerName").value.trim();
+    let phone = document.getElementById("customerPhone").value.trim();
+    let address = document.getElementById("customerAddress").value.trim();
+
+    if (!name || !phone || !address) {
+        alert("Please fill all fields!");
+        return;
+    }
+
+    let cart = JSON.parse(localStorage.getItem("cartItems")) || [];
+    if (cart.length === 0) {
+        alert("Cart is empty!");
+        return;
+    }
+
+    // WhatsApp Message
+    let message = `Order from Neelkanth Trades Customer\n\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\n\nItems:\n`;
+
+    cart.forEach(item => {
+        message += `${item.name} (Qty: ${item.qty})\n`;
+    });
+
+    // Send to WhatsApp
+    window.open(`https://wa.me/919416110032?text=${encodeURIComponent(message)}`, "_blank");
+
+    // Send to Google Sheets
+    fetch("https://script.google.com/macros/s/AKfycbySqzLslLCofg_x3z6NwiSkcuzPEdSBPsIntZihRsRmrAIPGqO476Y0FlwnDFafY8x6HA/exec", {
+        method: "POST",
+        body: JSON.stringify({
+            name: name,
+            phone: phone,
+            address: address,
+            cart: cart
+        })
+    });
+
+    // Clear cart after ordering
+    localStorage.removeItem("cartItems");
+
+    alert("Order placed successfully!");
+}
+
+window.onload = loadSummary;
+</script>
+
+</body>
+</html>
+
