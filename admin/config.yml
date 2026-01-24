@@ -13,7 +13,6 @@ collections:
     create: true
     slug: "{{slug}}"
     fields:
-      - { label: "Product ID", name: "id", widget: "string" }
       - { label: "Product Name", name: "name", widget: "string" }
       - { label: "Brand", name: "brand", widget: "string", required: false }
       - { label: "Category", name: "category", widget: "select", options: ["grocery", "cosmetics", "hygiene"] }

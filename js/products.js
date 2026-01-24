@@ -1,68 +1,44 @@
 // ==================================================
-// PRODUCT DATA (THIS COMES FROM EXCEL)
+// PRODUCT DATA (FROM CMS via GitHub)
 // ==================================================
 
-const PRODUCTS = [
-    {
-        name: "Vim Liquid 200ml",
-        price: "₹60 (Pack of 12)",
-        image: "vim-liquid-200ml.jpg",
-        category: "Grocery",
-        id: "vim",
-        popular: true
-    },
-    {
-        name: "Surf Excel 1KG",
-        price: "₹120",
-        image: "surf-excel-1kg.jpg",
-        category: "Grocery",
-        id: "surf"
-    },
-    {
-        name: "Aashirvaad Atta 10KG",
-        price: "₹380",
-        image: "aashirvad-atta-10kg.jpg",
-        category: "Grocery",
-        id: "atta"
-    },
-    {
-        name: "Sugar 1KG",
-        price: "₹45",
-        image: "sugar-1kg.jpg",
-        category: "Grocery",
-        id: "sugar"
-    },
-    {
-        name: "Oil 1L",
-        price: "₹120",
-        image: "oil-1l.jpg",
-        category: "Grocery",
-        id: "oil"
-    },
-    {
-        name: "Fair and Lovely 10ml",
-        price: "₹20 (Pack of 144)",
-        image: "fair-and-lovely-10ml.jpg",
-        category: "Cosmetics",
-        id: "fair",
-        popular: true
-    },
-    {
-        name: "Patanjali Facewash",
-        price: "₹60 (Pack of 84)",
-        image: "patanjali-facewash.jpg",
-        category: "Cosmetics",
-        id: "patanjali"
-    },
-    {
-        name: "Harpic 500ml",
-        price: "₹94 (Pack of 24)",
-        image: "harpic-500ml.jpg",
-        category: "Hygiene",
-        id: "harpic",
-        popular: true
+let PRODUCTS = [];
+
+// ===============================
+// LOAD PRODUCTS FROM GITHUB (CMS)
+// ===============================
+
+async function loadProducts() {
+    try {
+        const apiUrl = "https://api.github.com/repos/rakshit1278-coder/neelkanth-trades/contents/data/products";
+
+        const res = await fetch(apiUrl);
+        const files = await res.json();
+
+        const jsonFiles = files.filter(f => f.name.endsWith(".json"));
+
+        const productPromises = jsonFiles.map(f =>
+            fetch(f.download_url).then(r => r.json())
+        );
+
+        PRODUCTS = await Promise.all(productPromises);
+
+        renderProducts();
+        renderHomeProducts();
+    } catch (err) {
+        console.error("Failed to load products:", err);
     }
-];
+}
+
+// ==================================================
+// HELPER: AUTO GENERATE ID FROM NAME
+// ==================================================
+
+function makeId(name) {
+    return name.toLowerCase()
+        .replace(/[^a-z0-9]/g, "-")
+        .replace(/-+/g, "-");
+}
 
 // ==================================================
 // RENDER PRODUCTS INTO SHOP PAGE
@@ -70,12 +46,12 @@ const PRODUCTS = [
 
 function renderProducts() {
     const categoryMap = {
-        "Grocery": document.getElementById("groceryProducts"),
-        "Cosmetics": document.getElementById("cosmeticsProducts"),
-        "Hygiene": document.getElementById("hygieneProducts")
+        "grocery": document.getElementById("groceryProducts"),
+        "cosmetics": document.getElementById("cosmeticsProducts"),
+        "hygiene": document.getElementById("hygieneProducts")
     };
 
-    if (!categoryMap.Grocery || !categoryMap.Cosmetics || !categoryMap.Hygiene) return;
+    if (!categoryMap.grocery || !categoryMap.cosmetics || !categoryMap.hygiene) return;
 
     Object.values(categoryMap).forEach(grid => grid.innerHTML = "");
 
@@ -83,28 +59,28 @@ function renderProducts() {
         const grid = categoryMap[p.category];
         if (!grid) return;
 
+        const pid = makeId(p.name);
+
         grid.innerHTML += `
             <div class="product-card">
-                <img src="img/${p.image}" alt="${p.name}">
+                <img src="${p.image}" alt="${p.name}">
                 <h4>${p.name}</h4>
-                <p>${p.price}</p>
+                <p>₹${p.price}</p>
 
                 <div class="qty-box">
-                    <button class="qty-btn" onclick="decreaseQty('${p.id}')">-</button>
-                    <span id="${p.id}_qty" class="qty-number">0</span>
-                    <button class="qty-btn" onclick="increaseQty('${p.id}')">+</button>
+                    <button class="qty-btn" onclick="decreaseQty('${pid}')">-</button>
+                    <span id="${pid}_qty" class="qty-number">0</span>
+                    <button class="qty-btn" onclick="increaseQty('${pid}')">+</button>
                 </div>
 
                 <button class="add-btn"
-                    onclick="addToCartQty('${p.name} - ${p.price}', '${p.id}')">
+                    onclick="addToCartQty('${p.name} - ₹${p.price}', '${pid}')">
                     Add to Cart
                 </button>
             </div>
         `;
     });
 }
-
-document.addEventListener("DOMContentLoaded", renderProducts);
 
 // ==================================================
 // HOME PAGE: POPULAR PRODUCTS ONLY
@@ -117,19 +93,21 @@ function renderHomeProducts() {
     homeContainer.innerHTML = "";
 
     PRODUCTS.filter(p => p.popular).forEach(p => {
+        const pid = makeId(p.name);
+
         homeContainer.innerHTML += `
             <div class="product-card">
-                <img src="img/${p.image}" alt="${p.name}">
+                <img src="${p.image}" alt="${p.name}">
                 <h4>${p.name}</h4>
-                <p>${p.price}</p>
+                <p>₹${p.price}</p>
 
                 <div class="qty-box">
-                    <button class="qty-btn" onclick="decreaseQty('${p.id}')">-</button>
-                    <span id="${p.id}_qty" class="qty-number">0</span>
-                    <button class="qty-btn" onclick="increaseQty('${p.id}')">+</button>
+                    <button class="qty-btn" onclick="decreaseQty('${pid}')">-</button>
+                    <span id="${pid}_qty" class="qty-number">0</span>
+                    <button class="qty-btn" onclick="increaseQty('${pid}')">+</button>
                 </div>
 
-                <button onclick="addToCartQty('${p.name} - ${p.price}', '${p.id}')"
+                <button onclick="addToCartQty('${p.name} - ₹${p.price}', '${pid}')"
                         class="qty-btn" style="margin-top:10px;">
                     Add to Cart
                 </button>
@@ -138,4 +116,8 @@ function renderHomeProducts() {
     });
 }
 
-document.addEventListener("DOMContentLoaded", renderHomeProducts);
+// ==================================================
+// INIT
+// ==================================================
+
+document.addEventListener("DOMContentLoaded", loadProducts);
