@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Neelkanth Trades</title>
 
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+
 <style>
 body {
     font-family: Arial, sans-serif;
@@ -284,6 +287,16 @@ document.addEventListener("click", e => {
         box.style.display = "none";
     }
 });
+</script>
+
+<script>
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on("init", user => {
+      if (!user) {
+        console.log("Not logged in");
+      }
+    });
+  }
 </script>
 
 </body>
