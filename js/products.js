@@ -45,7 +45,6 @@ function renderProducts(PRODUCTS) {
       <div class="product-card">
         <img src="${p.image}" alt="${p.name}">
         <h4>${p.name}</h4>
-        <p>₹${p.price}</p>
 
         <div class="qty-box">
           <button class="qty-btn" onclick="decreaseQty('${id}')">-</button>
@@ -75,7 +74,6 @@ function renderHomeProducts(PRODUCTS) {
       <div class="product-card">
         <img src="${p.image}" alt="${p.name}">
         <h4>${p.name}</h4>
-        <p>₹${p.price}</p>
 
         <div class="qty-box">
           <button class="qty-btn" onclick="decreaseQty('${id}')">-</button>
