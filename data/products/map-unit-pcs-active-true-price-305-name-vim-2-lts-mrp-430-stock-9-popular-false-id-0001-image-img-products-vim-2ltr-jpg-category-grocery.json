@@ -1,0 +1,12 @@
+{
+  "unit": "pcs",
+  "active": true,
+  "price": 305,
+  "name": "vim 2 lts",
+  "mrp": 430,
+  "stock": 9,
+  "popular": false,
+  "id": "0001",
+  "image": "/img/products/vim-2ltr.jpg",
+  "category": "grocery"
+}
