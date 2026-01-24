@@ -1,43 +1,27 @@
 // ==================================================
-// PRODUCT DATA (FROM CMS via GitHub)
+// LOAD PRODUCTS FROM CMS (data/products/*.json)
 // ==================================================
 
 let PRODUCTS = [];
 
-// ===============================
-// LOAD PRODUCTS FROM GITHUB (CMS)
-// ===============================
-
 async function loadProducts() {
     try {
-        const apiUrl = "https://api.github.com/repos/rakshit1278-coder/neelkanth-trades/contents/data/products";
+        const response = await fetch("/data/products/");
+        const text = await response.text();
 
-        const res = await fetch(apiUrl);
-        const files = await res.json();
+        // Get all json file names from directory listing
+        const files = [...text.matchAll(/href="([^"]+\.json)"/g)]
+            .map(m => m[1])
+            .filter(f => !f.includes("keep"));
 
-        const jsonFiles = files.filter(f => f.name.endsWith(".json"));
-
-        const productPromises = jsonFiles.map(f =>
-            fetch(f.download_url).then(r => r.json())
-        );
-
-        PRODUCTS = await Promise.all(productPromises);
+        const requests = files.map(f => fetch("/data/products/" + f).then(r => r.json()));
+        PRODUCTS = await Promise.all(requests);
 
         renderProducts();
         renderHomeProducts();
     } catch (err) {
-        console.error("Failed to load products:", err);
+        console.error("Failed to load products from CMS", err);
     }
-}
-
-// ==================================================
-// HELPER: AUTO GENERATE ID FROM NAME
-// ==================================================
-
-function makeId(name) {
-    return name.toLowerCase()
-        .replace(/[^a-z0-9]/g, "-")
-        .replace(/-+/g, "-");
 }
 
 // ==================================================
@@ -59,7 +43,7 @@ function renderProducts() {
         const grid = categoryMap[p.category];
         if (!grid) return;
 
-        const pid = makeId(p.name);
+        const id = p.name.toLowerCase().replace(/\s+/g, "_");
 
         grid.innerHTML += `
             <div class="product-card">
@@ -68,13 +52,13 @@ function renderProducts() {
                 <p>₹${p.price}</p>
 
                 <div class="qty-box">
-                    <button class="qty-btn" onclick="decreaseQty('${pid}')">-</button>
-                    <span id="${pid}_qty" class="qty-number">0</span>
-                    <button class="qty-btn" onclick="increaseQty('${pid}')">+</button>
+                    <button class="qty-btn" onclick="decreaseQty('${id}')">-</button>
+                    <span id="${id}_qty" class="qty-number">0</span>
+                    <button class="qty-btn" onclick="increaseQty('${id}')">+</button>
                 </div>
 
                 <button class="add-btn"
-                    onclick="addToCartQty('${p.name} - ₹${p.price}', '${pid}')">
+                    onclick="addToCartQty('${p.name} - ₹${p.price}', '${id}')">
                     Add to Cart
                 </button>
             </div>
@@ -93,7 +77,7 @@ function renderHomeProducts() {
     homeContainer.innerHTML = "";
 
     PRODUCTS.filter(p => p.popular).forEach(p => {
-        const pid = makeId(p.name);
+        const id = p.name.toLowerCase().replace(/\s+/g, "_");
 
         homeContainer.innerHTML += `
             <div class="product-card">
@@ -102,12 +86,12 @@ function renderHomeProducts() {
                 <p>₹${p.price}</p>
 
                 <div class="qty-box">
-                    <button class="qty-btn" onclick="decreaseQty('${pid}')">-</button>
-                    <span id="${pid}_qty" class="qty-number">0</span>
-                    <button class="qty-btn" onclick="increaseQty('${pid}')">+</button>
+                    <button class="qty-btn" onclick="decreaseQty('${id}')">-</button>
+                    <span id="${id}_qty" class="qty-number">0</span>
+                    <button class="qty-btn" onclick="increaseQty('${id}')">+</button>
                 </div>
 
-                <button onclick="addToCartQty('${p.name} - ₹${p.price}', '${pid}')"
+                <button onclick="addToCartQty('${p.name} - ₹${p.price}', '${id}')"
                         class="qty-btn" style="margin-top:10px;">
                     Add to Cart
                 </button>
@@ -116,8 +100,6 @@ function renderHomeProducts() {
     });
 }
 
-// ==================================================
-// INIT
 // ==================================================
 
 document.addEventListener("DOMContentLoaded", loadProducts);
