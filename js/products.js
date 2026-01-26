@@ -1,7 +1,8 @@
 let PRODUCTS = [];
 
 async function loadProducts() {
-  const res = await fetch("/data/products/index.json");
+  // Fetch list of product files from GitHub raw (Netlify can't list folders)
+  const res = await fetch("https://raw.githubusercontent.com/rakshit1278-coder/neelkanth-trades/main/data/products/index.json");
   const files = await res.json();
 
   const productPromises = files.map(file =>
@@ -32,13 +33,10 @@ function renderProducts() {
     const grid = categoryMap[p.category];
     if (!grid) return;
 
-    const imageFile = p.image?.src || p.image || "no-image.png";
-
     grid.innerHTML += `
       <div class="product-card">
-        <img src="img/${imageFile}" alt="${p.name}">
+        <img src="img/${p.image || 'no-image.png'}" alt="${p.name}">
         <h4>${p.name}</h4>
-        <p>MRP: ₹${p.mrp}</p>
 
         <div class="qty-box">
           <button onclick="decreaseQty('${p.name}')">-</button>
@@ -64,13 +62,10 @@ function renderHomeProducts() {
   homeContainer.innerHTML = "";
 
   PRODUCTS.filter(p => p.popular).forEach(p => {
-    const imageFile = p.image?.src || p.image || "no-image.png";
-
     homeContainer.innerHTML += `
       <div class="product-card">
-        <img src="img/${imageFile}" alt="${p.name}">
+        <img src="img/${p.image || 'no-image.png'}" alt="${p.name}">
         <h4>${p.name}</h4>
-        <p>MRP: ₹${p.mrp}</p>
       </div>
     `;
   });
