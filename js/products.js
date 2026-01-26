@@ -1,59 +1,50 @@
-const GITHUB_API =
-  "https://api.github.com/repos/rakshit1278-coder/neelkanth-trades/contents/data/products";
+let PRODUCTS = [];
 
-async function loadProductsFromCMS() {
-  try {
-    const res = await fetch(GITHUB_API);
-    const files = await res.json();
+async function loadProducts() {
+  const res = await fetch("/data/products/index.json");
+  const files = await res.json();
 
-    const productFiles = files.filter(f => f.name.endsWith(".json"));
+  const productPromises = files.map(file =>
+    fetch(`/data/products/${file}`).then(r => r.json())
+  );
 
-    let PRODUCTS = [];
+  PRODUCTS = await Promise.all(productPromises);
 
-    for (let file of productFiles) {
-      const fileRes = await fetch(file.download_url);
-      const product = await fileRes.json();
-      PRODUCTS.push(product);
-    }
-
-    renderProducts(PRODUCTS);
-    renderHomeProducts(PRODUCTS);
-
-  } catch (err) {
-    console.error("Failed to load products", err);
-  }
+  renderProducts();
+  renderHomeProducts();
 }
 
-// ================= RENDER =================
-
-function renderProducts(PRODUCTS) {
+// =============================
+// RENDER SHOP PRODUCTS
+// =============================
+function renderProducts() {
   const categoryMap = {
-    grocery: document.getElementById("groceryProducts"),
-    cosmetics: document.getElementById("cosmeticsProducts"),
-    hygiene: document.getElementById("hygieneProducts")
+    "grocery": document.getElementById("groceryProducts"),
+    "cosmetics": document.getElementById("cosmeticsProducts"),
+    "hygiene": document.getElementById("hygieneProducts")
   };
 
-  Object.values(categoryMap).forEach(g => g && (g.innerHTML = ""));
+  if (!categoryMap.grocery || !categoryMap.cosmetics || !categoryMap.hygiene) return;
+
+  Object.values(categoryMap).forEach(grid => grid.innerHTML = "");
 
   PRODUCTS.forEach(p => {
     const grid = categoryMap[p.category];
-    if (!grid || p.active === false) return;
-
-    const id = p.name.replace(/\s+/g, "_").toLowerCase();
+    if (!grid) return;
 
     grid.innerHTML += `
       <div class="product-card">
-        <img src="${p.image}" alt="${p.name}">
+        <img src="img/${p.image || 'no-image.png'}" alt="${p.name}">
         <h4>${p.name}</h4>
+        <p>MRP: ₹${p.mrp}</p>
 
         <div class="qty-box">
-          <button class="qty-btn" onclick="decreaseQty('${id}')">-</button>
-          <span id="${id}_qty" class="qty-number">0</span>
-          <button class="qty-btn" onclick="increaseQty('${id}')">+</button>
+          <button onclick="decreaseQty('${p.name}')">-</button>
+          <span id="${p.name}_qty">0</span>
+          <button onclick="increaseQty('${p.name}')">+</button>
         </div>
 
-        <button class="add-btn"
-          onclick="addToCartQty('${p.name} - ₹${p.price}', '${id}')">
+        <button onclick="addToCartQty('${p.name}', '${p.name}')">
           Add to Cart
         </button>
       </div>
@@ -61,33 +52,24 @@ function renderProducts(PRODUCTS) {
   });
 }
 
-function renderHomeProducts(PRODUCTS) {
+// =============================
+// HOME POPULAR PRODUCTS
+// =============================
+function renderHomeProducts() {
   const homeContainer = document.getElementById("home-products");
   if (!homeContainer) return;
 
   homeContainer.innerHTML = "";
 
   PRODUCTS.filter(p => p.popular).forEach(p => {
-    const id = p.name.replace(/\s+/g, "_").toLowerCase();
-
     homeContainer.innerHTML += `
       <div class="product-card">
-        <img src="${p.image}" alt="${p.name}">
+        <img src="img/${p.image || 'no-image.png'}" alt="${p.name}">
         <h4>${p.name}</h4>
-
-        <div class="qty-box">
-          <button class="qty-btn" onclick="decreaseQty('${id}')">-</button>
-          <span id="${id}_qty" class="qty-number">0</span>
-          <button class="qty-btn" onclick="increaseQty('${id}')">+</button>
-        </div>
-
-        <button onclick="addToCartQty('${p.name} - ₹${p.price}', '${id}')"
-                class="qty-btn" style="margin-top:10px;">
-          Add to Cart
-        </button>
+        <p>MRP: ₹${p.mrp}</p>
       </div>
     `;
   });
 }
 
-document.addEventListener("DOMContentLoaded", loadProductsFromCMS);
+document.addEventListener("DOMContentLoaded", loadProducts);
