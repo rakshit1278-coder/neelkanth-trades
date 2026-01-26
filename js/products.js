@@ -1,18 +1,15 @@
 let PRODUCTS = [];
 
 async function loadProducts() {
-  // Fetch list of product files from GitHub raw (Netlify can't list folders)
-  const res = await fetch("https://raw.githubusercontent.com/rakshit1278-coder/neelkanth-trades/main/data/products/index.json");
-  const files = await res.json();
+  try {
+    const res = await fetch("/data/products/index.json");
+    PRODUCTS = await res.json();
 
-  const productPromises = files.map(file =>
-    fetch(`/data/products/${file}`).then(r => r.json())
-  );
-
-  PRODUCTS = await Promise.all(productPromises);
-
-  renderProducts();
-  renderHomeProducts();
+    renderProducts();
+    renderHomeProducts();
+  } catch (err) {
+    console.error("Failed to load products:", err);
+  }
 }
 
 // =============================
@@ -35,8 +32,9 @@ function renderProducts() {
 
     grid.innerHTML += `
       <div class="product-card">
-        <img src="img/${p.image || 'no-image.png'}" alt="${p.name}">
+        <img src="img/products/${p.image || 'no-image.jpg'}" alt="${p.name}">
         <h4>${p.name}</h4>
+        <p>MRP: ₹${p.mrp}</p>
 
         <div class="qty-box">
           <button onclick="decreaseQty('${p.name}')">-</button>
@@ -64,8 +62,9 @@ function renderHomeProducts() {
   PRODUCTS.filter(p => p.popular).forEach(p => {
     homeContainer.innerHTML += `
       <div class="product-card">
-        <img src="img/${p.image || 'no-image.png'}" alt="${p.name}">
+        <img src="img/products/${p.image || 'no-image.jpg'}" alt="${p.name}">
         <h4>${p.name}</h4>
+        <p>MRP: ₹${p.mrp}</p>
       </div>
     `;
   });
