@@ -32,9 +32,11 @@ function renderProducts() {
     const grid = categoryMap[p.category];
     if (!grid) return;
 
+    const imageFile = p.image?.src || p.image || "no-image.png";
+
     grid.innerHTML += `
       <div class="product-card">
-        <img src="img/${p.image || 'no-image.png'}" alt="${p.name}">
+        <img src="img/${imageFile}" alt="${p.name}">
         <h4>${p.name}</h4>
         <p>MRP: ₹${p.mrp}</p>
 
@@ -62,9 +64,11 @@ function renderHomeProducts() {
   homeContainer.innerHTML = "";
 
   PRODUCTS.filter(p => p.popular).forEach(p => {
+    const imageFile = p.image?.src || p.image || "no-image.png";
+
     homeContainer.innerHTML += `
       <div class="product-card">
-        <img src="img/${p.image || 'no-image.png'}" alt="${p.name}">
+        <img src="img/${imageFile}" alt="${p.name}">
         <h4>${p.name}</h4>
         <p>MRP: ₹${p.mrp}</p>
       </div>
