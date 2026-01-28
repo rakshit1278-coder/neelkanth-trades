@@ -1,16 +1,18 @@
 let PRODUCTS = [];
 
+// =============================
+// LOAD PRODUCTS
+// =============================
 async function loadProducts() {
-  const res = await fetch("/data/products/index.json");
-  PRODUCTS = await res.json();
+  try {
+    const res = await fetch("/data/products/index.json");
+    PRODUCTS = await res.json();
 
-  renderProducts();
-  renderHomeProducts();
-}
-  
-
-  renderProducts();
-  renderHomeProducts();
+    renderProducts();
+    renderHomeProducts();
+  } catch (err) {
+    console.error("Failed to load products:", err);
+  }
 }
 
 // =============================
@@ -18,9 +20,9 @@ async function loadProducts() {
 // =============================
 function renderProducts() {
   const categoryMap = {
-    "grocery": document.getElementById("groceryProducts"),
-    "cosmetics": document.getElementById("cosmeticsProducts"),
-    "hygiene": document.getElementById("hygieneProducts")
+    grocery: document.getElementById("groceryProducts"),
+    cosmetics: document.getElementById("cosmeticsProducts"),
+    hygiene: document.getElementById("hygieneProducts")
   };
 
   if (!categoryMap.grocery || !categoryMap.cosmetics || !categoryMap.hygiene) return;
@@ -35,16 +37,16 @@ function renderProducts() {
 
     grid.innerHTML += `
       <div class="product-card">
-        <img src="img/${encodeURIComponent(p.image || 'no-image.jpg')}" alt="${p.name}">
+        <img src="img/${encodeURIComponent(p.image || "no-image.jpg")}" alt="${p.name}">
         <h4>${p.name}</h4>
 
         <div class="qty-box">
-          <button onclick="changeQty('${safeId}', -1)">-</button>
+          <button class="qty-btn" onclick="changeQty('${safeId}', -1)">-</button>
           <input type="number" id="${safeId}_qty" value="0" min="0">
-          <button onclick="changeQty('${safeId}', 1)">+</button>
+          <button class="qty-btn" onclick="changeQty('${safeId}', 1)">+</button>
         </div>
 
-        <button onclick="addToCartFromInput('${safeId}', '${p.name}')">
+        <button class="add-btn" onclick="addToCartFromInput('${safeId}', '${p.name}')">
           Add to Cart
         </button>
       </div>
@@ -57,6 +59,8 @@ function renderProducts() {
 // =============================
 function changeQty(id, delta) {
   const input = document.getElementById(id + "_qty");
+  if (!input) return;
+
   let val = parseInt(input.value) || 0;
   val += delta;
   if (val < 0) val = 0;
@@ -68,14 +72,17 @@ function changeQty(id, delta) {
 // =============================
 function addToCartFromInput(id, name) {
   const input = document.getElementById(id + "_qty");
-  const qty = parseInt(input.value) || 0;
+  if (!input) return;
 
+  const qty = parseInt(input.value) || 0;
   if (qty <= 0) {
     alert("Enter quantity first");
     return;
   }
 
-  addToCart(name, qty);
+  // USE main.js cart function
+  addToCartQty(name, id);
+
   input.value = 0;
 }
 
@@ -93,16 +100,16 @@ function renderHomeProducts() {
 
     homeContainer.innerHTML += `
       <div class="product-card">
-        <img src="img/${encodeURIComponent(p.image || 'no-image.jpg')}" alt="${p.name}">
+        <img src="img/${encodeURIComponent(p.image || "no-image.jpg")}" alt="${p.name}">
         <h4>${p.name}</h4>
 
         <div class="qty-box">
-          <button onclick="changeQty('${safeId}', -1)">-</button>
+          <button class="qty-btn" onclick="changeQty('${safeId}', -1)">-</button>
           <input type="number" id="${safeId}_qty" value="0" min="0">
-          <button onclick="changeQty('${safeId}', 1)">+</button>
+          <button class="qty-btn" onclick="changeQty('${safeId}', 1)">+</button>
         </div>
 
-        <button onclick="addToCartFromInput('${safeId}', '${p.name}')">
+        <button class="add-btn" onclick="addToCartFromInput('${safeId}', '${p.name}')">
           Add to Cart
         </button>
       </div>
@@ -110,4 +117,5 @@ function renderHomeProducts() {
   });
 }
 
+// =============================
 document.addEventListener("DOMContentLoaded", loadProducts);
