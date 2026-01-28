@@ -1,0 +1,27 @@
+{
+  "name": "g-mart-main",
+  "version": "1.0.0",
+  "description": "![Screenshot 2024-08-03 134441](https://github.com/user-attachments/assets/f8684971-8bd4-466f-88d5-9b1ce81eadcb)",
+  "main": "excel-to-json.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rakshit1278-coder/neelkanth-trades.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/rakshit1278-coder/neelkanth-trades/issues"
+  },
+  "homepage": "https://github.com/rakshit1278-coder/neelkanth-trades#readme",
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  }
+}

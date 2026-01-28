@@ -19,16 +19,19 @@ function updateCartCount() {
 // --------------------------------------------------
 
 function increaseQty(id) {
-    const span = document.getElementById(id + "_qty");
-    if (!span) return;
-    span.innerText = parseInt(span.innerText) + 1;
+    const input = document.getElementById(id + "_qty");
+    if (!input) return;
+
+    let val = parseInt(input.value) || 0;
+    input.value = val + 1;
 }
 
 function decreaseQty(id) {
-    const span = document.getElementById(id + "_qty");
-    if (!span) return;
-    let current = parseInt(span.innerText);
-    if (current > 0) span.innerText = current - 1;
+    const input = document.getElementById(id + "_qty");
+    if (!input) return;
+
+    let val = parseInt(input.value) || 0;
+    if (val > 0) input.value = val - 1;
 }
 
 // --------------------------------------------------
@@ -36,24 +39,30 @@ function decreaseQty(id) {
 // --------------------------------------------------
 
 function addToCartQty(productName, productId) {
-  let qtyInput = document.getElementById(productId + "_qty");
-  let qty = parseInt(qtyInput.value || qtyInput.innerText);
+    const qtyInput = document.getElementById(productId + "_qty");
+    if (!qtyInput) return;
 
-  if (!qty || qty <= 0) return;
+    let qty = parseInt(qtyInput.value);
 
-  // rest of your existing cart code stays SAME
-}
+    if (!qty || qty <= 0) {
+        alert("Please enter quantity");
+        return;
+    }
 
     let existing = cart.find(item => item.name === productName);
+
     if (existing) {
         existing.qty += qty;
     } else {
-        cart.push({ name: productName, qty });
+        cart.push({ name: productName, qty: qty });
     }
 
     saveCart();
     updateCartCount();
+
     alert(productName + " added x " + qty);
+
+    qtyInput.value = 0;
 }
 
 // --------------------------------------------------
@@ -189,4 +198,3 @@ function submitOrder() {
 document.addEventListener("DOMContentLoaded", () => {
     updateCartCount();
 });
-
