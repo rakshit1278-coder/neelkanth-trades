@@ -1,17 +1,13 @@
 let PRODUCTS = [];
 
-// =============================
-// LOAD PRODUCTS
-// =============================
 async function loadProducts() {
   const res = await fetch("/data/products/index.json");
-  const files = await res.json();
+  PRODUCTS = await res.json();
 
-  const productPromises = files.map(file =>
-    fetch(`/data/products/${file}`).then(r => r.json())
-  );
-
-  PRODUCTS = await Promise.all(productPromises);
+  renderProducts();
+  renderHomeProducts();
+}
+  
 
   renderProducts();
   renderHomeProducts();
