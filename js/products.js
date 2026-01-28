@@ -7,7 +7,6 @@ async function loadProducts() {
   try {
     const res = await fetch("/data/products/index.json");
     PRODUCTS = await res.json();
-
     renderProducts();
     renderHomeProducts();
   } catch (err) {
@@ -26,7 +25,6 @@ function renderProducts() {
   };
 
   if (!categoryMap.grocery || !categoryMap.cosmetics || !categoryMap.hygiene) return;
-
   Object.values(categoryMap).forEach(grid => grid.innerHTML = "");
 
   PRODUCTS.forEach(p => {
@@ -41,7 +39,6 @@ function renderProducts() {
       <div class="product-card">
         <img src="img/${encodeURIComponent(p.image || 'no-image.jpg')}" alt="${p.name}">
         <h4>${p.name}</h4>
-        <p>MRP: ₹${p.mrp}</p>
 
         <div class="qty-box">
           <button class="qty-btn" onclick="changeQty('${safeId}', -1)">−</button>
@@ -52,11 +49,19 @@ function renderProducts() {
             value="0"
             id="${safeId}_qty"
             class="qty-input"
-            onchange="setQty('${safeId}', this.value)"
+            oninput="onManualQty('${safeId}')"
           />
 
           <button class="qty-btn" onclick="changeQty('${safeId}', 1)">+</button>
         </div>
+
+        <button 
+          class="add-btn"
+          id="${safeId}_addBtn"
+          style="display:none;margin-top:8px;"
+          onclick="confirmManualQty('${safeId}')">
+          Add to Cart
+        </button>
       </div>
     `;
   });
@@ -76,36 +81,42 @@ function renderHomeProducts() {
       <div class="product-card">
         <img src="img/${encodeURIComponent(p.image || 'no-image.jpg')}" alt="${p.name}">
         <h4>${p.name}</h4>
-        <p>MRP: ₹${p.mrp}</p>
       </div>
     `;
   });
 }
 
 // =============================
-// QTY → CART LOGIC
+// QTY LOGIC
 // =============================
+
+// + / - = instant cart update
 function changeQty(id, delta) {
   const input = document.getElementById(id + "_qty");
   let currentQty = parseInt(input.value) || 0;
   let newQty = currentQty + delta;
-
   if (newQty < 0) return;
 
   input.value = newQty;
+  document.getElementById(id + "_addBtn").style.display = "none";
   updateCartFromQty(id, newQty);
 }
 
-function setQty(id, value) {
-  let qty = parseInt(value) || 0;
-  if (qty < 0) qty = 0;
+// manual typing = show Add button
+function onManualQty(id) {
+  const btn = document.getElementById(id + "_addBtn");
+  btn.style.display = "inline-block";
+}
 
+// confirm manual qty
+function confirmManualQty(id) {
   const input = document.getElementById(id + "_qty");
-  input.value = qty;
-
+  let qty = parseInt(input.value) || 0;
+  document.getElementById(id + "_addBtn").style.display = "none";
   updateCartFromQty(id, qty);
 }
 
+// common cart update
 function updateCartFromQty(id, qty) {
   const product = PRODUCTS.find(p => p.name.replace(/[^a-zA-Z0-9]/g, "_") === id);
   if (!product) return;
