@@ -49,7 +49,6 @@ function renderProducts() {
             value="0"
             id="${safeId}_qty"
             class="qty-input"
-            oninput="onManualQty('${safeId}')"
           />
 
           <button class="qty-btn" onclick="changeQty('${safeId}', 1)">+</button>
@@ -57,9 +56,8 @@ function renderProducts() {
 
         <button 
           class="add-btn"
-          id="${safeId}_addBtn"
-          style="display:none;margin-top:8px;"
-          onclick="confirmManualQty('${safeId}')">
+          onclick="addProductToCart('${safeId}')"
+          style="margin-top:8px;">
           Add to Cart
         </button>
       </div>
@@ -87,45 +85,31 @@ function renderHomeProducts() {
 }
 
 // =============================
-// QTY LOGIC
+// QTY LOGIC (ONLY UI)
 // =============================
-
-// + / - = instant cart update
 function changeQty(id, delta) {
   const input = document.getElementById(id + "_qty");
   let currentQty = parseInt(input.value) || 0;
   let newQty = currentQty + delta;
   if (newQty < 0) return;
-
   input.value = newQty;
-  document.getElementById(id + "_addBtn").style.display = "none";
-  updateCartFromQty(id, newQty);
 }
 
-// manual typing = show Add button
-function onManualQty(id) {
-  const btn = document.getElementById(id + "_addBtn");
-  btn.style.display = "inline-block";
-}
-
-// confirm manual qty
-function confirmManualQty(id) {
+// =============================
+// ADD TO CART (ONLY HERE)
+// =============================
+function addProductToCart(id) {
   const input = document.getElementById(id + "_qty");
   let qty = parseInt(input.value) || 0;
-  document.getElementById(id + "_addBtn").style.display = "none";
-  updateCartFromQty(id, qty);
-}
+  if (qty <= 0) {
+    alert("Please select quantity first");
+    return;
+  }
 
-// common cart update
-function updateCartFromQty(id, qty) {
   const product = PRODUCTS.find(p => p.name.replace(/[^a-zA-Z0-9]/g, "_") === id);
   if (!product) return;
 
-  if (qty === 0) {
-    removeFromCart(product.name);
-  } else {
-    addToCartQty(product.name, product.name, qty);
-  }
+  addToCartQty(product.name, product.name, qty);
 }
 
 // =============================
