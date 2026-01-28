@@ -98,9 +98,10 @@ function changeQty(id, delta) {
 // =============================
 // ADD TO CART (ONLY HERE)
 // =============================
-function addProductToCart(id) {
+   function addProductToCart(id) {
   const input = document.getElementById(id + "_qty");
   let qty = parseInt(input.value) || 0;
+
   if (qty <= 0) {
     alert("Please select quantity first");
     return;
@@ -109,8 +110,10 @@ function addProductToCart(id) {
   const product = PRODUCTS.find(p => p.name.replace(/[^a-zA-Z0-9]/g, "_") === id);
   if (!product) return;
 
-  addToCartQty(product.name, product.name, qty);
+  // EXACTLY like your old system
+  addToCartQty(product.name, id);
 }
 
+  
 // =============================
 document.addEventListener("DOMContentLoaded", loadProducts);
