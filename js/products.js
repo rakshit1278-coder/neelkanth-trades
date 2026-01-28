@@ -59,22 +59,15 @@ function renderProducts() {
 // =============================
 function changeQty(id, delta) {
   const input = document.getElementById(id + "_qty");
-  if (!input) return;
-
   let val = parseInt(input.value) || 0;
   val += delta;
   if (val < 0) val = 0;
   input.value = val;
 
   const card = input.closest(".product-card");
-
-  if (val > 0) {
-    card.classList.add("selected");
-  } else {
-    card.classList.remove("selected");
-  }
+  if (val > 0) card.classList.add("active");
+  else card.classList.remove("active");
 }
-  
 
 // =============================
 // ADD TO CART FROM INPUT
