@@ -381,3 +381,122 @@
     font-size: 20px;
   }
 }
+
+/* ===== KEEP YOUR EXISTING CSS ABOVE ===== */
+
+/* =====================================
+   NEW ADDITIONS (UI IMPROVEMENTS)
+===================================== */
+
+.qty-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.qty-box button {
+    width: 42px;
+    height: 42px;
+    font-size: 22px;
+    border-radius: 6px;
+    border: none;
+    background: #0f8a52;
+    color: white;
+}
+
+.qty-box input {
+    width: 60px;
+    height: 42px;
+    text-align: center;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+/* ===== HIGHLIGHT WHEN QTY > 0 ===== */
+.product-card.selected {
+    border: 2px solid #0f8a52;
+    box-shadow: 0 0 12px rgba(15,138,82,0.4);
+    background: #f0fff8;
+}
+
+/* ===== ADDED ANIMATION ===== */
+@keyframes addedPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.product-card.added {
+    animation: addedPulse 0.3s ease;
+}
+
+/* ===== STICKY BOTTOM CART BAR ===== */
+.sticky-cart-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #0f8a52;
+    color: white;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 9999;
+}
+
+.sticky-cart-bar span {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.sticky-cart-bar button {
+    background: white;
+    color: #0f8a52;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* ===== MOBILE: 2 PRODUCTS PER ROW ===== */
+@media (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .product-card img {
+    width: 100%;
+    height: 110px;
+    object-fit: contain;
+  }
+
+  .product-card h4 {
+    font-size: 14px;
+  }
+
+  .qty-box button {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+  }
+
+  .qty-box input {
+    width: 60px;
+    height: 44px;
+    font-size: 16px;
+  }
+}
+.product-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.product-card:hover {
+  transform: scale(1.02);
+}
+

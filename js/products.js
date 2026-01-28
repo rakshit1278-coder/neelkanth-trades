@@ -65,7 +65,16 @@ function changeQty(id, delta) {
   val += delta;
   if (val < 0) val = 0;
   input.value = val;
+
+  const card = input.closest(".product-card");
+
+  if (val > 0) {
+    card.classList.add("selected");
+  } else {
+    card.classList.remove("selected");
+  }
 }
+  
 
 // =============================
 // ADD TO CART FROM INPUT
@@ -75,15 +84,16 @@ function addToCartFromInput(id, name) {
   if (!input) return;
 
   const qty = parseInt(input.value) || 0;
-  if (qty <= 0) {
-    alert("Enter quantity first");
-    return;
-  }
+  if (qty <= 0) return;
 
-  // USE main.js cart function
   addToCartQty(name, id);
 
+  const card = input.closest(".product-card");
+  card.classList.add("added");
+  setTimeout(() => card.classList.remove("added"), 300);
+
   input.value = 0;
+  card.classList.remove("selected");
 }
 
 // =============================
