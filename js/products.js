@@ -1,5 +1,8 @@
 let PRODUCTS = [];
 
+// =============================
+// LOAD PRODUCTS
+// =============================
 async function loadProducts() {
   try {
     const res = await fetch("/data/products/index.json");
@@ -8,7 +11,7 @@ async function loadProducts() {
     renderProducts();
     renderHomeProducts();
   } catch (err) {
-    console.error("Failed to load products:", err);
+    console.error("Error loading products:", err);
   }
 }
 
@@ -27,8 +30,12 @@ function renderProducts() {
   Object.values(categoryMap).forEach(grid => grid.innerHTML = "");
 
   PRODUCTS.forEach(p => {
+    if (!p.active) return;
+
     const grid = categoryMap[p.category];
     if (!grid) return;
+
+    const safeId = p.name.replace(/[^a-zA-Z0-9]/g, "_");
 
     grid.innerHTML += `
       <div class="product-card">
@@ -37,14 +44,19 @@ function renderProducts() {
         <p>MRP: ₹${p.mrp}</p>
 
         <div class="qty-box">
-          <button onclick="decreaseQty('${p.name}')">-</button>
-          <span id="${p.name}_qty">0</span>
-          <button onclick="increaseQty('${p.name}')">+</button>
-        </div>
+          <button class="qty-btn" onclick="changeQty('${safeId}', -1)">−</button>
 
-        <button onclick="addToCartQty('${p.name}', '${p.name}')">
-          Add to Cart
-        </button>
+          <input 
+            type="number" 
+            min="0" 
+            value="0"
+            id="${safeId}_qty"
+            class="qty-input"
+            onchange="setQty('${safeId}', this.value)"
+          />
+
+          <button class="qty-btn" onclick="changeQty('${safeId}', 1)">+</button>
+        </div>
       </div>
     `;
   });
@@ -59,7 +71,7 @@ function renderHomeProducts() {
 
   homeContainer.innerHTML = "";
 
-  PRODUCTS.filter(p => p.popular).forEach(p => {
+  PRODUCTS.filter(p => p.popular && p.active).forEach(p => {
     homeContainer.innerHTML += `
       <div class="product-card">
         <img src="img/${encodeURIComponent(p.image || 'no-image.jpg')}" alt="${p.name}">
@@ -70,4 +82,40 @@ function renderHomeProducts() {
   });
 }
 
+// =============================
+// QTY → CART LOGIC
+// =============================
+function changeQty(id, delta) {
+  const input = document.getElementById(id + "_qty");
+  let currentQty = parseInt(input.value) || 0;
+  let newQty = currentQty + delta;
+
+  if (newQty < 0) return;
+
+  input.value = newQty;
+  updateCartFromQty(id, newQty);
+}
+
+function setQty(id, value) {
+  let qty = parseInt(value) || 0;
+  if (qty < 0) qty = 0;
+
+  const input = document.getElementById(id + "_qty");
+  input.value = qty;
+
+  updateCartFromQty(id, qty);
+}
+
+function updateCartFromQty(id, qty) {
+  const product = PRODUCTS.find(p => p.name.replace(/[^a-zA-Z0-9]/g, "_") === id);
+  if (!product) return;
+
+  if (qty === 0) {
+    removeFromCart(product.name);
+  } else {
+    addToCartQty(product.name, product.name, qty);
+  }
+}
+
+// =============================
 document.addEventListener("DOMContentLoaded", loadProducts);
