@@ -35,15 +35,14 @@ function decreaseQty(id) {
 // ADD TO CART
 // --------------------------------------------------
 
-function addToCartQty(productName, id) {
-    const span = document.getElementById(id + "_qty");
-    if (!span) return;
+function addToCartQty(productName, productId) {
+  let qtyInput = document.getElementById(productId + "_qty");
+  let qty = parseInt(qtyInput.value || qtyInput.innerText);
 
-    let qty = parseInt(span.innerText);
-    if (qty === 0) {
-        alert("Please increase quantity before adding to cart");
-        return;
-    }
+  if (!qty || qty <= 0) return;
+
+  // rest of your existing cart code stays SAME
+}
 
     let existing = cart.find(item => item.name === productName);
     if (existing) {
