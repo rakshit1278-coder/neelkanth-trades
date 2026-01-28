@@ -32,7 +32,7 @@ function renderProducts() {
 
     grid.innerHTML += `
       <div class="product-card">
-        <img src="img/products/${p.image || 'no-image.jpg'}" alt="${p.name}">
+        <img src="img/${encodeURIComponent(p.image || 'no-image.jpg')}" alt="${p.name}">
         <h4>${p.name}</h4>
         <p>MRP: ₹${p.mrp}</p>
 
@@ -62,7 +62,7 @@ function renderHomeProducts() {
   PRODUCTS.filter(p => p.popular).forEach(p => {
     homeContainer.innerHTML += `
       <div class="product-card">
-        <img src="img/products/${p.image || 'no-image.jpg'}" alt="${p.name}">
+        <img src="img/${encodeURIComponent(p.image || 'no-image.jpg')}" alt="${p.name}">
         <h4>${p.name}</h4>
         <p>MRP: ₹${p.mrp}</p>
       </div>
